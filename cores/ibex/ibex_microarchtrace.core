@@ -10,6 +10,7 @@ filesets:
       - lowrisc:ibex:ibex_simple_system
     files:
       - ibex_microarchtrace.sv
+      - ibex_bind.sv
       - ibex_microarchtrace.cc: { file_type: cppSource }
     file_type: systemVerilogSource
 
