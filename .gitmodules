@@ -1,0 +1,3 @@
+[submodule "cores/ibex/sources"]
+	path = cores/ibex/sources
+	url = https://github.com/lowrisc/ibex

@@ -1,0 +1,5 @@
+trace*
+*.fst
+*.log
+*.csv
+build/
