@@ -12,7 +12,8 @@ typedef uint32_t timestamp_t;
 enum {
   TRACE_IF = 0,
   TRACE_IDEX = 1,
-  TRACE_IDEX_MULT_END = 2
+  TRACE_IDEX_MULTCYCLE_START = 2,
+  TRACE_IDEX_MULTCYCLE_END = 3
 };
 
 class IbexMicroArchTrace {
@@ -74,7 +75,14 @@ event {
 };
 event {
   id = 2;
-  name = "IDEX_MULT_END";
+  name = "IDEX_MULTCYCLE_START";
+  fields := struct {
+    uint32_t pc;
+  };
+};
+event {
+  id = 3;
+  name = "IDEX_MULTCYCLE_END";
   fields := struct {
     uint32_t pc;
   };
@@ -140,8 +148,11 @@ public:
   void traceIDEX(uint32_t pc) {
     trace(cur_time(), TRACE_IDEX, "L", pc);
   }
+  void traceIDEXMultStart(uint32_t pc) {
+    trace(cur_time(), TRACE_IDEX_MULTCYCLE_START, "L", pc);
+  }
   void traceIDEXMultEnd(uint32_t pc) {
-    trace(cur_time(), TRACE_IDEX_MULT_END, "L", pc);
+    trace(cur_time(), TRACE_IDEX_MULTCYCLE_END, "L", pc);
   }
 };
 
@@ -166,6 +177,10 @@ extern "C" {
 
   void trace_idex(int pc) {
     trace.traceIDEX(pc);
+  }
+
+  void trace_idex_mult_start(int pc) {
+    trace.traceIDEXMultStart(pc);
   }
 
   void trace_idex_mult_end(int pc) {

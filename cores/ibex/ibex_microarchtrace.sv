@@ -7,6 +7,7 @@ import "DPI-C" function void trace_if(int pc, int insn, logic c, shortint c_insn
 import "DPI-C" function void trace_if_start();
 import "DPI-C" function void trace_if_end(int pc, int insn, logic c, shortint c_insn);
 import "DPI-C" function void trace_idex(int pc);
+import "DPI-C" function void trace_idex_mult_start(int pc);
 import "DPI-C" function void trace_idex_mult_end(int pc);
 
 module ibex_microarchtrace (
@@ -70,7 +71,7 @@ module ibex_microarchtrace (
           else
             trace_idex(idex_pc);
         end else if (!idex_multicycle)
-            trace_idex(idex_pc);
+            trace_idex_mult_start(idex_pc);
       end
     end
   end
