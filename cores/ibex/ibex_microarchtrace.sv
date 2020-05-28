@@ -50,6 +50,16 @@ module ibex_microarchtrace (
     idex_done_q <= idex_done;
 
     if (active) begin
+      if (idex_executing) begin
+        if (idex_done) begin
+          if (idex_multicycle)
+            trace_idex_mult_end(idex_pc);
+          else
+            trace_idex(idex_pc);
+        end else if (!idex_multicycle)
+            trace_idex_mult_start(idex_pc);
+      end
+
       if (fetch_ready) begin
         if (fetch_valid) begin
           // Single cycle fetch
@@ -62,16 +72,6 @@ module ibex_microarchtrace (
           if (!fetch_ready_q || (fetch_ready_q && fetch_valid_q))
             trace_if_start();
         end
-      end
-
-      if (idex_executing) begin
-        if (idex_done) begin
-          if (idex_multicycle)
-            trace_idex_mult_end(idex_pc);
-          else
-            trace_idex(idex_pc);
-        end else if (!idex_multicycle)
-            trace_idex_mult_start(idex_pc);
       end
     end
   end

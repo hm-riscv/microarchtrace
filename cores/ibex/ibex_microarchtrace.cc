@@ -58,6 +58,7 @@ event {
   id = 0;
   name = "IF";
   fields := struct {
+    uint32_t insn_id;
     uint32_t pc;
     enum : uint8_t { regular, compact } insn_type;
     variant <insn_type> {
@@ -70,6 +71,7 @@ event {
   id = 1;
   name = "IDEX";
   fields := struct {
+    uint32_t insn_id;
     uint32_t pc;
   };
 };
@@ -77,6 +79,7 @@ event {
   id = 2;
   name = "IDEX_MULTCYCLE_START";
   fields := struct {
+    uint32_t insn_id;
     uint32_t pc;
   };
 };
@@ -84,12 +87,14 @@ event {
   id = 3;
   name = "IDEX_MULTCYCLE_END";
   fields := struct {
+    uint32_t insn_id;
     uint32_t pc;
   };
 };
   )metadata";
 
 public:
+  IbexMicroArchTrace() : m_trace(0), m_IFStart(0), m_IDEXStart(0), m_nextid(0) {}
   void init() {
     mkdir("trace", 0777);
     FILE* metadataf = fopen("trace/metadata", "w");
@@ -130,6 +135,8 @@ public:
 private:
   timestamp_t m_IFStart;
   timestamp_t m_IDEXStart;
+  uint32_t m_nextid;
+  uint32_t m_idexid;
 
   timestamp_t cur_time() {
     return VerilatorSimCtrl::GetInstance().GetTime() >> 1;
@@ -141,18 +148,20 @@ public:
   void traceIF(bool multi, uint32_t pc, uint32_t insn, uint8_t c, uint16_t c_insn) {
     timestamp_t time = multi ? m_IFStart : cur_time();
     if (c)
-      trace(time, TRACE_IF, "LBH", pc, 1, c_insn);
+      trace(time, TRACE_IF, "LLBH", m_nextid++, pc, 1, c_insn);
     else
-      trace(time, TRACE_IF, "LBL", pc, 0, insn);
+      trace(time, TRACE_IF, "LLBL", m_nextid++, pc, 0, insn);
   }
   void traceIDEX(uint32_t pc) {
-    trace(cur_time(), TRACE_IDEX, "L", pc);
+    m_idexid = m_nextid-1;
+    trace(cur_time(), TRACE_IDEX, "LL", m_idexid, pc);
   }
   void traceIDEXMultStart(uint32_t pc) {
-    trace(cur_time(), TRACE_IDEX_MULTCYCLE_START, "L", pc);
+    m_idexid = m_nextid-1;
+    trace(cur_time(), TRACE_IDEX_MULTCYCLE_START, "LL", m_idexid, pc);
   }
   void traceIDEXMultEnd(uint32_t pc) {
-    trace(cur_time(), TRACE_IDEX_MULTCYCLE_END, "L", pc);
+    trace(cur_time(), TRACE_IDEX_MULTCYCLE_END, "LL", m_idexid, pc);
   }
 };
 

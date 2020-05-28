@@ -1,3 +1,6 @@
 [submodule "cores/ibex/sources"]
 	path = cores/ibex/sources
 	url = https://github.com/lowrisc/ibex
+[submodule "cores/cv32e40p/sources"]
+	path = cores/cv32e40p/sources
+	url = https://github.com/openhwgroup/cv32e40p.git
