@@ -4,3 +4,6 @@
 [submodule "cores/cv32e40p/sources"]
 	path = cores/cv32e40p/sources
 	url = https://github.com/openhwgroup/cv32e40p.git
+[submodule "cores/swerv-el2/sources"]
+	path = cores/swerv-el2/sources
+	url = https://github.com/chipsalliance/Cores-SweRV-EL2
