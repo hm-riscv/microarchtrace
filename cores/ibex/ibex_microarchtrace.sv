@@ -44,12 +44,12 @@ module ibex_microarchtrace (
   assign idex_multicycle = idex_executing_q && !idex_done_q;
 
   always @(posedge clk) begin
-    fetch_ready_q <= fetch_ready;
-    fetch_valid_q <= fetch_valid;
-    idex_executing_q <= idex_executing;
-    idex_done_q <= idex_done;
-
     if (active) begin
+      fetch_ready_q <= fetch_ready;
+      fetch_valid_q <= fetch_valid;
+      idex_executing_q <= idex_executing;
+      idex_done_q <= idex_done;
+
       if (idex_executing) begin
         if (idex_done) begin
           if (idex_multicycle)
