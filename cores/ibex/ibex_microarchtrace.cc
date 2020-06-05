@@ -60,6 +60,7 @@ event {
   fields := struct {
     uint32_t insn_id;
     uint32_t pc;
+    uint8_t mode;
     enum : uint8_t { regular, compact } insn_type;
     variant <insn_type> {
       uint32_t regular;
@@ -145,12 +146,12 @@ public:
   void traceIFStart() {
     m_IFStart = cur_time();
   }
-  void traceIF(bool multi, uint32_t pc, uint32_t insn, uint8_t c, uint16_t c_insn) {
+  void traceIF(bool multi, uint32_t pc, uint32_t insn, uint8_t mode, uint8_t c, uint16_t c_insn) {
     timestamp_t time = multi ? m_IFStart : cur_time();
     if (c)
-      trace(time, TRACE_IF, "LLBH", m_nextid++, pc, 1, c_insn);
+      trace(time, TRACE_IF, "LLBBH", m_nextid++, pc, mode, 1, c_insn);
     else
-      trace(time, TRACE_IF, "LLBL", m_nextid++, pc, 0, insn);
+      trace(time, TRACE_IF, "LLBBL", m_nextid++, pc, mode, 0, insn);
   }
   void traceIDEX(uint32_t pc) {
     m_idexid = m_nextid-1;
@@ -172,16 +173,16 @@ extern "C" {
     trace.init();
   }
 
-  void trace_if(int pc, int insn, svLogic c, short int c_insn) {
-    trace.traceIF(false, pc, insn, c, c_insn);
+  void trace_if(int pc, int insn, char mode, svLogic c, short int c_insn) {
+    trace.traceIF(false, pc, insn, mode, c, c_insn);
   }
 
   void trace_if_start() {
     trace.traceIFStart();
   }
 
-  void trace_if_end(int pc, int insn, svLogic c, short int c_insn) {
-    trace.traceIF(true, pc, insn, c, c_insn);
+  void trace_if_end(int pc, int insn, char mode, svLogic c, short int c_insn) {
+    trace.traceIF(true, pc, insn, mode, c, c_insn);
   }
 
   void trace_idex(int pc) {

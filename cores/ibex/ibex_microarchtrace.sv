@@ -3,9 +3,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import "DPI-C" function void trace_init();
-import "DPI-C" function void trace_if(int pc, int insn, logic c, shortint c_insn);
+import "DPI-C" function void trace_if(int pc, int insn, byte mode, logic c, shortint c_insn);
 import "DPI-C" function void trace_if_start();
-import "DPI-C" function void trace_if_end(int pc, int insn, logic c, shortint c_insn);
+import "DPI-C" function void trace_if_end(int pc, int insn, byte mode, logic c, shortint c_insn);
 import "DPI-C" function void trace_idex(int pc);
 import "DPI-C" function void trace_idex_mult_start(int pc);
 import "DPI-C" function void trace_idex_mult_end(int pc);
@@ -16,6 +16,7 @@ module ibex_microarchtrace (
   input fetch_ready,
   input fetch_valid,
   input [31:0] fetch_pc,
+  input [1:0] fetch_mode,
   input [31:0] fetch_insn,
   input fetch_c,
   input [15:0] fetch_c_insn,
@@ -64,10 +65,10 @@ module ibex_microarchtrace (
         if (fetch_valid) begin
           // Single cycle fetch
           if (!fetch_ready_q || (fetch_ready_q && fetch_valid_q))
-            trace_if(fetch_pc, fetch_insn, fetch_c, fetch_c_insn);
+            trace_if(fetch_pc, fetch_insn, byte'(fetch_mode), fetch_c, fetch_c_insn);
           // End multicycle fetch
           if (fetch_ready_q && !fetch_valid_q)
-            trace_if_end(fetch_pc, fetch_insn, fetch_c, fetch_c_insn);
+            trace_if_end(fetch_pc, fetch_insn, byte'(fetch_mode), fetch_c, fetch_c_insn);
         end else begin
           if (!fetch_ready_q || (fetch_ready_q && fetch_valid_q))
             trace_if_start();

@@ -9,6 +9,7 @@ module ibex_bind;
     .fetch_ready (u_core.u_ibex_core.if_stage_i.fetch_ready),
     .fetch_valid (u_core.u_ibex_core.if_stage_i.fetch_valid),
     .fetch_pc  (u_core.u_ibex_core.if_stage_i.pc_if_o),
+    .fetch_mode (u_core.u_ibex_core.priv_mode_if),
     .fetch_insn (u_core.u_ibex_core.if_stage_i.instr_out),
     .fetch_c   (u_core.u_ibex_core.if_stage_i.instr_is_compressed_out),
     .fetch_c_insn (u_core.u_ibex_core.if_stage_i.fetch_rdata[15:0]),
