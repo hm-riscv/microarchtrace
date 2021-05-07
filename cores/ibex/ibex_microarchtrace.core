@@ -15,46 +15,70 @@ filesets:
     file_type: systemVerilogSource
 
 parameters:
-  RV32M:
-    datatype: int
-    paramtype: vlogparam
-    default: 1
-    description: "Enable the M ISA extension (hardware multiply/divide) [0/1]"
-
   RV32E:
     datatype: int
     paramtype: vlogparam
     default: 0
     description: "Enable the E ISA extension (reduced register set) [0/1]"
 
-  RV32B:
-    datatype: int
-    paramtype: vlogparam
-    default: 0
-    description: "Enable the B ISA extension (bit manipulation EXPERIMENTAL) [0/1]"
-
-  SRAM_INIT_FILE:
+  RV32M:
     datatype: str
+    default: ibex_pkg::RV32MFast
     paramtype: vlogdefine
-    description: "Path to a vmem file to initialize the RAM with"
+    description: "RV32M implementation parameter enum. See the ibex_pkg::rv32m_e enum in ibex_pkg.sv for permitted values."
 
-  MultiplierImplementation:
+  RV32B:
+    datatype: str
+    default: ibex_pkg::RV32BNone
+    paramtype: vlogdefine
+    description: "Bitmanip implementation parameter enum. See the ibex_pkg::rv32b_e enum in ibex_pkg.sv for permitted values."
+
+  RegFile:
+    datatype: str
+    default: ibex_pkg::RegFileFF
+    paramtype: vlogdefine
+    description: "Register file implementation parameter enum. See the ibex_pkg::regfile_e enum in ibex_pkg.sv for permitted values."
+
+  ICache:
+    datatype: int
+    default: 0
+    paramtype: vlogparam
+    description: "Enable instruction cache"
+
+  ICacheECC:
+    datatype: int
+    default: 0
+    paramtype: vlogparam
+    description: "Enable ECC protection in instruction cache"
+
+  SRAMInitFile:
     datatype: str
     paramtype: vlogparam
-    description: "Multiplier implementation. Valid values: fast, slow, single-cycle"
-    default: "fast"
+    description: "Path to a vmem file to initialize the RAM with"
 
   BranchTargetALU:
     datatype: int
     paramtype: vlogparam
     default: 0
-    description: "Enables seperate branch target ALU (increasing branch performance EXPERIMENTAL)"
+    description: "Enables separate branch target ALU (increasing branch performance EXPERIMENTAL)"
 
   WritebackStage:
     datatype: int
     paramtype: vlogparam
     default: 0
     description: "Enables third pipeline stage (EXPERIMENTAL)"
+
+  SecureIbex:
+    datatype: int
+    default: 0
+    paramtype: vlogparam
+    description: "Enables security hardening features (EXPERIMENTAL) [0/1]"
+
+  BranchPredictor:
+    datatype: int
+    paramtype: vlogparam
+    default: 0
+    description: "Enables static branch prediction (EXPERIMENTAL)"
 
   PMPEnable:
     datatype: int
@@ -74,22 +98,32 @@ parameters:
     paramtype: vlogparam
     description: "Number of PMP regions"
 
+  WRITEBACK_STAGE:
+    datatype: bool
+    paramtype: vlogdefine
+    scope: public
+
 targets:
   sim:
     default_tool: verilator
     filesets:
       - files_sim_verilator
     parameters:
-      - RV32M
       - RV32E
+      - RV32M
       - RV32B
-      - MultiplierImplementation
+      - RegFile
+      - ICache
+      - ICacheECC
       - BranchTargetALU
       - WritebackStage
+      - SecureIbex
+      - BranchPredictor
       - PMPEnable
       - PMPGranularity
       - PMPNumRegions
-      - SRAM_INIT_FILE
+      - SRAMInitFile
+      - WRITEBACK_STAGE
     toplevel: ibex_simple_system
     tools:
       vcs:

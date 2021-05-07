@@ -12,8 +12,8 @@ typedef uint32_t timestamp_t;
 enum {
   TRACE_IF = 0,
   TRACE_IDEX = 1,
-  TRACE_IDEX_MULTCYCLE_START = 2,
-  TRACE_IDEX_MULTCYCLE_END = 3
+  TRACE_WB = 2,
+  TRACE_DONE = 3
 };
 
 class IbexMicroArchTrace {
@@ -78,7 +78,7 @@ event {
 };
 event {
   id = 2;
-  name = "IDEX_MULTCYCLE_START";
+  name = "WB";
   fields := struct {
     uint32_t insn_id;
     uint32_t pc;
@@ -86,16 +86,16 @@ event {
 };
 event {
   id = 3;
-  name = "IDEX_MULTCYCLE_END";
+  name = "DONE";
   fields := struct {
     uint32_t insn_id;
     uint32_t pc;
   };
 };
-  )metadata";
+)metadata";
 
 public:
-  IbexMicroArchTrace() : m_trace(0), m_IFStart(0), m_IDEXStart(0), m_nextid(0) {}
+  IbexMicroArchTrace() : m_trace(0), m_IFStart(0), m_IDEXStart(0), m_nextid(0), m_idexid(0), m_wbid(UINT32_MAX) {}
   void init() {
     mkdir("trace", 0777);
     FILE* metadataf = fopen("trace/metadata", "w");
@@ -138,6 +138,7 @@ private:
   timestamp_t m_IDEXStart;
   uint32_t m_nextid;
   uint32_t m_idexid;
+  uint32_t m_wbid;
 
   timestamp_t cur_time() {
     return VerilatorSimCtrl::GetInstance().GetTime() >> 1;
@@ -157,12 +158,16 @@ public:
     m_idexid = m_nextid-1;
     trace(cur_time(), TRACE_IDEX, "LL", m_idexid, pc);
   }
-  void traceIDEXMultStart(uint32_t pc) {
-    m_idexid = m_nextid-1;
-    trace(cur_time(), TRACE_IDEX_MULTCYCLE_START, "LL", m_idexid, pc);
+  void traceWB(uint32_t pc) {
+    m_wbid = m_nextid-2;
+    trace(cur_time(), TRACE_WB, "LL", m_wbid, pc);
   }
-  void traceIDEXMultEnd(uint32_t pc) {
-    trace(cur_time(), TRACE_IDEX_MULTCYCLE_END, "LL", m_idexid, pc);
+  void traceDone(uint32_t pc) {
+    if (m_wbid != UINT32_MAX) {
+      trace(cur_time(), TRACE_DONE, "LL", m_wbid, pc);
+    } else {
+      trace(cur_time(), TRACE_DONE, "LL", m_idexid, pc);
+    }
   }
 };
 
@@ -189,11 +194,11 @@ extern "C" {
     trace.traceIDEX(pc);
   }
 
-  void trace_idex_mult_start(int pc) {
-    trace.traceIDEXMultStart(pc);
+  void trace_wb(int pc) {
+    trace.traceWB(pc);
   }
 
-  void trace_idex_mult_end(int pc) {
-    trace.traceIDEXMultEnd(pc);
+  void trace_done(int pc) {
+    trace.traceDone(pc);
   }
 }
