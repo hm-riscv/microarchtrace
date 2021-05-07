@@ -7,8 +7,8 @@ import "DPI-C" function void trace_if(int pc, int insn, byte mode, logic c, shor
 import "DPI-C" function void trace_if_start();
 import "DPI-C" function void trace_if_end(int pc, int insn, byte mode, logic c, shortint c_insn);
 import "DPI-C" function void trace_idex(int pc);
-import "DPI-C" function void trace_idex_mult_start(int pc);
-import "DPI-C" function void trace_idex_mult_end(int pc);
+import "DPI-C" function void trace_wb(int pc);
+import "DPI-C" function void trace_done(int pc);
 
 module ibex_microarchtrace (
   input clk,
@@ -22,7 +22,10 @@ module ibex_microarchtrace (
   input [15:0] fetch_c_insn,
   input idex_executing,
   input idex_done,
-  input [31:0] idex_pc
+  input [31:0] idex_pc,
+  input wb_en,
+  input wb_done,
+  input [31:0] wb_pc
 );
   reg active;
   reg rst_n_q;
@@ -51,14 +54,18 @@ module ibex_microarchtrace (
       idex_executing_q <= idex_executing;
       idex_done_q <= idex_done;
 
+      if (wb_en)
+        trace_wb(wb_pc);
+      if (wb_done)
+        trace_done(wb_pc);
+
       if (idex_executing) begin
         if (idex_done) begin
-          if (idex_multicycle)
-            trace_idex_mult_end(idex_pc);
-          else
+          if (!idex_multicycle)
             trace_idex(idex_pc);
+          trace_done(idex_pc);
         end else if (!idex_multicycle)
-            trace_idex_mult_start(idex_pc);
+            trace_idex(idex_pc);
       end
 
       if (fetch_ready) begin
