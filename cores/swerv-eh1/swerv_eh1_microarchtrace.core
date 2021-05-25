@@ -1,0 +1,41 @@
+CAPI=2:
+# Copyright Munich University of Applied Sciences.
+# Licensed under the Apache License, Version 2.0, see LICENSE for details.
+# SPDX-License-Identifier: Apache-2.0
+name: "hm:microarchtrace:swerv_eh1"
+description: "Microarchitecture tracing of the SWERV EH1 core"
+filesets:
+  files_sim_verilator:
+    depend:
+      - fusesoc:utils:generators
+      - chipsalliance.org:cores:SweRV_EH1
+    files:
+      - swerv_eh1_microarchtrace.sv
+      - swerv_eh1_bind.sv
+      - swerv_eh1_microarchtrace.cc : { file_type: cppSource }
+      - sources/testbench/tb_top.sv
+      - sources/testbench/ahb_sif.sv
+      - sources/testbench/dasm.svi : { is_include_file: true }
+      - sources/testbench/test_tb_top.cpp : {file_type : cppSource}
+    file_type: systemVerilogSource
+
+targets:
+  default:
+    filesets :
+      - files_sim_verilator
+  sim:
+    default_tool : verilator
+    filesets :
+      - files_sim_verilator
+    generate : [swerv_default_config]
+    tools:
+      verilator:
+        verilator_options : [--trace, -Wno-fatal]
+    toplevel : tb_top
+
+generate:
+  swerv_default_config:
+    generator: swerv_config
+    position : first
+    parameters:
+      args : ['-ahb_lite', -unset=assert_on]

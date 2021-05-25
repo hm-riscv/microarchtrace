@@ -1,0 +1,10 @@
+build/
+config/
+console.log
+exec.log
+fusesoc.conf
+fusesoc_libraries
+*.hex
+*.vcd
+trace/
+trace_port.csv
