@@ -12,7 +12,9 @@ module swerv_el2_bind;
     .de_compact (~rvtop.swerv.dec.dec_i0_pc4_d),
     .ex_valid (rvtop.swerv.dec.decode.i0_pipe_en[2]),
     .ex_pc ({rvtop.swerv.dec.exu_i0_pc_x,1'b0}),
-    .wb_valid (rv_trace_pkt.rv_i_valid_ip),
-    .wb_pc (rv_trace_pkt.rv_i_address_ip)
+    .lsu_nonblock_load_valid (rvtop.swerv.dec.lsu_nonblock_load_valid_m),
+    .wb_valid (rvtop.swerv.dec.dec_tlu_i0_valid_r),
+    .wb_pc ({rvtop.swerv.dec.dec_tlu_i0_pc_r,1'b0}),
+    .load_wb_valid (rvtop.swerv.dec.dec_nonblock_load_wen)
   );
 endmodule

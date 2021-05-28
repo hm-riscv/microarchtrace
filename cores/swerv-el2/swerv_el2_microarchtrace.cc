@@ -137,6 +137,7 @@ private:
   std::deque<de_t> m_de;
   typedef struct { uint32_t id; uint32_t pc; } ex_t;
   std::deque<ex_t> m_ex;
+  std::deque<ex_t> m_load;
 
   timestamp_t cur_time() {
     return (timestamp_t) sc_time_stamp()/10;
@@ -179,10 +180,29 @@ public:
     trace(cur_time(), TRACE_EX, "L", i.id);
     m_ex.push_back({.id = i.id, .pc = i.pc});
   }
-  void traceWB(uint32_t pc) {
-    ex_t i = m_ex.front(); m_ex.pop_front();
+  void traceLoad(uint32_t pc) {
+    de_t i = m_de.front(); m_de.pop_front();
     assert(pc == i.pc);
+    trace(cur_time(), TRACE_EX, "L", i.id);
+    m_load.push_back({.id = i.id, .pc = i.pc});
+  }
+  void traceWB(uint32_t pc) {
+    if (m_ex.size() == 0) {
+      return;
+    }
+    ex_t i = m_ex.front();
+    if (pc == i.pc) {
+       m_ex.pop_front();
+       trace(cur_time(), TRACE_WB, "L", i.id);
+    }
+  }
+  void traceLoadWB() {
+    ex_t i = m_load.front(); m_load.pop_front();
     trace(cur_time(), TRACE_WB, "L", i.id);
+  }
+  void print_state() {
+    printf("m_nextid=%d\n", m_nextid);
+    printf("m_de.size()=%d\n", m_de.size());
   }
 };
 
@@ -205,7 +225,15 @@ extern "C" {
     trace.traceEX(pc);
   }
 
+  void trace_load(int pc) {
+    trace.traceLoad(pc);
+  }
+
   void trace_wb(int pc) {
     trace.traceWB(pc);
+  }
+
+  void trace_loadwb() {
+    trace.traceLoadWB();
   }
 };
