@@ -14,6 +14,7 @@ filesets:
       - swerv_eh1_bind.sv
       - swerv_eh1_microarchtrace.cc : { file_type: cppSource }
       - sources/testbench/tb_top.sv
+      - sources/testbench/axi_lsu_dma_bridge.sv : { is_include_file: true }
       - sources/testbench/ahb_sif.sv
       - sources/testbench/dasm.svi : { is_include_file: true }
       - sources/testbench/test_tb_top.cpp : {file_type : cppSource}
@@ -30,12 +31,19 @@ targets:
     generate : [swerv_default_config]
     tools:
       verilator:
-        verilator_options : [--trace, -Wno-fatal]
+        verilator_options : [-Wno-fatal]
     toplevel : tb_top
+
 
 generate:
   swerv_default_config:
-    generator: swerv_config
+    generator: swerv_eh1_config
     position : first
     parameters:
-      args : ['-ahb_lite', -unset=assert_on]
+      args : [-unset=assert_on]
+
+generators:
+  swerv_eh1_config:
+    interpreter: python3
+    command: sources/configs/swerv_config_gen.py
+    description : Create a SweRV EH1 configuration. Note! Only supports the default config
