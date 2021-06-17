@@ -1,3 +1,9 @@
+## About
+
+This is a framework for microarchitecture tracing. It allows instructors and learners to run real world processor cores in a simulation and tracing environment that abstracts from design details and captures the relevant microarchitectural details instead.
+
+It uses [pipeline-viewer](https://pypi.org/project/pipelineviewer/) to visualize the microarchitectural details.
+
 ## Getting started
 
 Clone the repository and the cores:
