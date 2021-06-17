@@ -6,34 +6,19 @@ Clone the repository and the cores:
 git clone --recursive https://github.com/hm-riscv/microarchtrace
 ```
 
-### Ibex Core
-
-Go to directory:
+Install the Python3 prerequisites:
 
 ```bash
-cd cores/ibex
+pip3 install -r requirements.txt
 ```
 
-Build the simulation:
+You also need to install [Verilator](https://www.veripool.org/verilator/) and a build environment.
 
-```bash
-make build
-```
+For each core you can find a quick start and potential lab assignments in their respective folder in `cores/`.
 
-Run the simulation with the hello test:
+### Cores and their status
 
-```bash
-make run
-```
+- [Ibex Core](cores/ibex/)
+- [SWERV EL2](cores/swerv-el2)
+- [SWERV EH1](cores/swerv-eh1)
 
-Potentially you need to set the compiler to your RISC-V compiler:
-
-```bash
-make run CC=riscv64-unknown-elf-gcc
-```
-
-Inspect the microarchitecture trace:
-
-```bash
-babeltrace trace/
-```
