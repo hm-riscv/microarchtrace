@@ -68,6 +68,7 @@ event {
   name = "DEC";
   fields := struct {
     uint32_t pc;
+    uint32_t insn;
   };
 };
 event {
@@ -157,8 +158,8 @@ public:
   void traceALN(uint32_t pc) {
     trace(cur_time(), TRACE_ALN, "L", pc);
   }
-  void traceDEC(uint32_t pc) {
-    trace(cur_time(), TRACE_DEC, "L", pc);
+  void traceDEC(uint32_t pc, uint32_t insn) {
+    trace(cur_time(), TRACE_DEC, "LL", pc, insn);
   }
   void traceEX1(uint32_t pc) {
     trace(cur_time(), TRACE_EX1, "L", pc);
@@ -186,8 +187,8 @@ extern "C" {
   void trace_aln(int pc) {
     trace.traceALN(pc);
   }
-  void trace_dec(int pc) {
-    trace.traceDEC(pc);
+  void trace_dec(int pc, int insn) {
+    trace.traceDEC(pc, insn);
   }
   void trace_ex1(int pc) {
     trace.traceEX1(pc);

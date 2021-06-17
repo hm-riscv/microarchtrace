@@ -4,7 +4,7 @@
 
 import "DPI-C" function void trace_init();
 import "DPI-C" function void trace_aln(int pc);
-import "DPI-C" function void trace_dec(int pc);
+import "DPI-C" function void trace_dec(int pc, int insn);
 import "DPI-C" function void trace_ex1(int pc);
 import "DPI-C" function void trace_ex2(int pc);
 import "DPI-C" function void trace_ex3(int pc);
@@ -26,8 +26,10 @@ module swerv_eh1_microarchtrace(
     // Decode
     input dec_valid0,
     input [31:0] dec_pc0,
+    input [31:0] dec_insn0,
     input dec_valid1,
     input [31:0] dec_pc1,
+    input [31:0] dec_insn1,
     // Execute
     input ex1_valid0,
     input [31:0] ex1_pc0,
@@ -53,6 +55,8 @@ module swerv_eh1_microarchtrace(
     input [31:0] wb_pc1
 );
 
+    logic next0_is_finish, next1_is_finish;
+
     initial begin
         trace_init();
     end
@@ -71,11 +75,17 @@ module swerv_eh1_microarchtrace(
         if (ex3_valid0) trace_ex3(ex3_pc0);
         if (ex3_valid1) trace_ex3(ex3_pc1);
         // Decode
-        if (dec_valid0) trace_dec(dec_pc0);
-        if (dec_valid1) trace_dec(dec_pc1);
+        if (dec_valid0) trace_dec(dec_pc0, dec_insn0);
+        if (dec_valid1) trace_dec(dec_pc1, dec_insn1);
         // Fetch
         if (aln_valid0) trace_aln(aln_pc0);
         if (aln_valid1) trace_aln(aln_pc1);
+
+        if (dec_valid0 && (dec_insn0 == 32'h00002013)) next0_is_finish = 1;
+        if (dec_valid1 && (dec_insn1 == 32'h00002013)) next1_is_finish = 1;
+        if (wb_valid0 && next0_is_finish) $finish();
+        if (wb_valid1 && next1_is_finish) $finish();
+
     end
 
 endmodule
